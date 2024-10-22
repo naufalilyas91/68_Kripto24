@@ -1,0 +1,59 @@
+# Fungsi untuk menghitung GCD dan invers modulo menggunakan Extended Euclidean Algorithm
+def gcd_extended(a, b):
+    if a == 0:
+        return b, 0, 1
+    gcd, x1, y1 = gcd_extended(b % a, a)
+    x = y1 - (b // a) * x1
+    y = x1
+    return gcd, x, y
+
+# Fungsi untuk enkripsi satu karakter
+def encrypt_char(x, a, b):
+    return (a * x + b) % 26
+
+# Fungsi untuk dekripsi satu karakter
+def decrypt_char(y, a_inv, b):
+    return (a_inv * (y - b)) % 26
+
+# Mengubah huruf menjadi angka (A=0, B=1, ..., Z=25)
+def letter_to_number(text):
+    return [ord(c) - ord('A') for c in text]
+
+# Mengubah angka menjadi huruf
+def number_to_letter(numbers):
+    return ''.join([chr(num + ord('A')) for num in numbers])
+
+# Enkripsi seluruh teks
+def encrypt_text(plaintext, a, b):
+    num_list = letter_to_number(plaintext)
+    encrypted_nums = [encrypt_char(x, a, b) for x in num_list]
+    return number_to_letter(encrypted_nums)
+
+# Dekripsi seluruh teks
+def decrypt_text(ciphertext, a, b):
+    num_list = letter_to_number(ciphertext)
+    
+    # Cari a^(-1) menggunakan Extended Euclidean Algorithm
+    gcd, a_inv, y = gcd_extended(a, 26)
+    
+    if gcd != 1:
+        raise ValueError("Invers tidak ditemukan, karena GCD(a, 26) ≠ 1")
+    
+    a_inv = a_inv % 26  # Pastikan a_inv positif
+    decrypted_nums = [decrypt_char(y, a_inv, b) for y in num_list]
+    return number_to_letter(decrypted_nums)
+
+# Main
+if __name__ == "__main__":
+    # Nama yang akan dienkripsi
+    plaintext = "NAUFALFAKHRIILYAS".replace(" ", "")  # Menghapus spasi
+    a = 9
+    b = 68
+
+    # Enkripsi
+    ciphertext = encrypt_text(plaintext, a, b)
+    print(f"Hasil Enkripsi: {ciphertext}")
+
+    # Dekripsi
+    decrypted_text = decrypt_text(ciphertext, a, b)
+    print(f"Hasil Dekripsi: {decrypted_text}")
